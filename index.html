@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The 45 — Voice Training Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#17131f; --surface:#211b2c; --surface-2:#2b2438; --line:#3a3147;
+    --text:#f2ece1; --muted:#a89db8; --dim:#7a7089;
+    --accent:#e0a13c; --accent-deep:#c8822a;
+    --p1:#6f93a8; --p2:#4f9e86; --p3:#e0a13c; --p4:#e17a4f;
+    --ok:#4f9e86;
+    --sans:'Inter',system-ui,sans-serif; --grot:'Space Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--sans);
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+    padding:22px 18px 80px;
+  }
+  .wrap{max-width:760px;margin:0 auto}
+  a{color:var(--accent)}
+
+  /* HERO */
+  .brand{font-family:var(--grot);font-weight:600;letter-spacing:.02em;font-size:.82rem;color:var(--muted)}
+  .brand b{color:var(--accent)}
+  h1{font-family:var(--grot);font-weight:700;font-size:2.35rem;line-height:1.04;margin:.35rem 0 .3rem;letter-spacing:-.01em}
+  .sub{color:var(--muted);max-width:52ch;margin:0 0 1.1rem}
+  .wave{display:flex;align-items:flex-end;gap:3px;height:34px;margin:0 0 1.4rem;opacity:.55}
+  .wave span{width:3px;background:var(--accent);border-radius:2px;display:block}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 15px}
+  .stat .num{font-family:var(--grot);font-weight:700;font-size:1.9rem;line-height:1}
+  .stat .num small{font-size:.9rem;color:var(--dim);font-weight:500}
+  .stat .lab{color:var(--muted);font-size:.78rem;margin-top:5px}
+  .pbar{height:7px;border-radius:6px;background:var(--surface-2);overflow:hidden;margin:14px 0 0;border:1px solid var(--line)}
+  .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--p1),var(--p2),var(--p3),var(--p4));transition:width .5s ease}
+
+  section{margin-top:30px}
+  .head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .head h2{font-family:var(--grot);font-weight:600;font-size:1.15rem;margin:0}
+  .head .note{color:var(--dim);font-size:.8rem}
+
+  /* SESSION */
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px}
+  .step{display:flex;gap:13px;padding:14px 16px;border-bottom:1px solid var(--line);cursor:pointer;align-items:flex-start}
+  .step:last-of-type{border-bottom:none}
+  .box{flex:none;width:22px;height:22px;border-radius:7px;border:1.5px solid var(--dim);margin-top:2px;display:grid;place-items:center;transition:.15s}
+  .box svg{width:13px;height:13px;opacity:0;transform:scale(.6);transition:.15s}
+  .step.done .box{background:var(--ok);border-color:var(--ok)}
+  .step.done .box svg{opacity:1;transform:scale(1)}
+  .step.done .s-title{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--dim)}
+  .s-title{font-weight:600;font-size:.98rem}
+  .s-title .t{font-family:var(--grot);color:var(--accent);font-weight:600;font-size:.82rem;margin-left:7px}
+  .s-desc{color:var(--muted);font-size:.86rem;margin-top:3px}
+  .pencil{margin-top:7px;padding:8px 11px;background:var(--surface-2);border:1px dashed var(--accent-deep);border-radius:10px;font-size:.83rem}
+  .pencil b{color:var(--accent)}
+  .warnline{color:var(--dim);font-size:.78rem;margin-top:4px}
+
+  .session-foot{display:flex;gap:10px;align-items:center;padding:14px 16px;flex-wrap:wrap}
+  button{font-family:var(--sans);font-weight:600;font-size:.9rem;border:none;border-radius:11px;padding:11px 18px;cursor:pointer;transition:.15s}
+  .primary{background:var(--accent);color:#241a08}
+  .primary:disabled{background:var(--surface-2);color:var(--dim);cursor:not-allowed}
+  .ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+  .ghost:hover{color:var(--text)}
+  .foot-msg{color:var(--muted);font-size:.84rem}
+
+  /* GRID */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px}
+  .cell{aspect-ratio:1;border-radius:11px;border:1px solid var(--line);background:var(--surface);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;
+    font-family:var(--grot);position:relative;transition:transform .12s, background .2s}
+  .cell:hover{transform:translateY(-2px)}
+  .cell .d{font-weight:600;font-size:1rem;color:var(--muted)}
+  .cell .ph{font-size:.55rem;color:var(--dim);margin-top:1px}
+  .cell.today{outline:2px solid var(--accent);outline-offset:1px}
+  .cell.done .d{color:#1a1420}
+  .cell.done .ph{color:rgba(20,14,10,.65)}
+  .cell.p1.done{background:var(--p1)} .cell.p2.done{background:var(--p2)}
+  .cell.p3.done{background:var(--p3)} .cell.p4.done{background:var(--p4)}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-size:.8rem;color:var(--muted)}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+  /* PHASES */
+  .phases{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .phase{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 15px;border-left:4px solid}
+  .phase h3{font-family:var(--grot);margin:0 0 3px;font-size:.98rem}
+  .phase .days{color:var(--dim);font-size:.76rem;font-family:var(--grot)}
+  .phase p{margin:7px 0 0;color:var(--muted);font-size:.85rem}
+
+  /* WEEKS */
+  .weeks{display:flex;flex-wrap:wrap;gap:9px}
+  .wk{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 13px;cursor:pointer;font-size:.86rem}
+  .wk .wbox{width:17px;height:17px;border-radius:5px;border:1.5px solid var(--dim);display:grid;place-items:center}
+  .wk .wbox svg{width:10px;height:10px;opacity:0}
+  .wk.done{border-color:var(--ok)} .wk.done .wbox{background:var(--ok);border-color:var(--ok)} .wk.done .wbox svg{opacity:1}
+
+  /* REFERENCE */
+  .ref{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px}
+  .ref h3{font-family:var(--grot);margin:0 0 9px;font-size:1rem}
+  .ref ul{margin:0;padding-left:18px}
+  .ref li{margin:5px 0;color:var(--text);font-size:.9rem}
+  .ref li b{color:var(--accent);font-weight:600}
+  .ref.warn{border-color:var(--accent-deep)}
+  .ref.warn li b{color:var(--accent)}
+
+  .reset-all{margin-top:26px;text-align:center}
+  .reset-all button{font-size:.8rem}
+  footer{margin-top:24px;color:var(--dim);font-size:.78rem;text-align:center;line-height:1.6}
+
+  @media (max-width:520px){
+    h1{font-size:1.95rem}
+    .phases{grid-template-columns:1fr}
+    .stat .num{font-size:1.55rem}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+  @media print{
+    body{background:#fff;color:#000;padding:0}
+    .card,.stat,.cell,.phase,.wk,.ref{background:#fff;border-color:#bbb;color:#000}
+    .wave,.session-foot button,.reset-all{display:none}
+    .s-desc,.sub,.muted,.stat .lab{color:#333}
+    h1,.head h2,.brand b,.s-title .t{color:#000}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand"><b>THE 45</b> · voice rebuild protocol</div>
+  <h1>Deeper. Clearer.<br>On purpose.</h1>
+  <p class="sub">A 45-day daily protocol to fix rushed, nasal, pitched-up speech and build a calm, resonant, charismatic voice. One session a day. Tick it off. Watch the grid fill.</p>
+
+  <div class="wave" id="wave" aria-hidden="true"></div>
+
+  <div class="stats">
+    <div class="stat"><div class="num" id="stDone">0<small>/45</small></div><div class="lab">days completed</div></div>
+    <div class="stat"><div class="num" id="stPct">0<small>%</small></div><div class="lab">of protocol done</div></div>
+    <div class="stat"><div class="num" id="stPhase" style="font-size:1.15rem;padding-top:8px">Foundation</div><div class="lab" id="stPhaseD">days 1–7</div></div>
+  </div>
+  <div class="pbar"><i id="pbar"></i></div>
+
+  <!-- SESSION -->
+  <section>
+    <div class="head">
+      <h2 id="sessTitle">Today · Day 1 session</h2>
+      <span class="note">~25–30 min</span>
+    </div>
+    <div class="card" id="sessionCard"></div>
+  </section>
+
+  <!-- GRID -->
+  <section>
+    <div class="head"><h2>The 45-day grid</h2><span class="note">tap any day to toggle</span></div>
+    <div class="grid" id="grid"></div>
+    <div class="legend">
+      <span><i style="background:var(--p1)"></i>Foundation</span>
+      <span><i style="background:var(--p2)"></i>Build</span>
+      <span><i style="background:var(--p3)"></i>Integrate</span>
+      <span><i style="background:var(--p4)"></i>Polish</span>
+    </div>
+  </section>
+
+  <!-- PHASES -->
+  <section>
+    <div class="head"><h2>What each phase is for</h2></div>
+    <div class="phases">
+      <div class="phase" style="border-left-color:var(--p1)"><h3>Foundation</h3><div class="days">Days 1–7</div><p>Relax, breathe from the belly, find your true low pitch. Don't force depth yet — just build the habit and feel chest vibration.</p></div>
+      <div class="phase" style="border-left-color:var(--p2)"><h3>Build</h3><div class="days">Days 8–21</div><p>Attack nasality hard (ng→ah + pinch test). Extend breath. Ramp articulation. Start slowing down in real conversations.</p></div>
+      <div class="phase" style="border-left-color:var(--p3)"><h3>Integrate</h3><div class="days">Days 22–35</div><p>Carry the practice voice into real life — calls, ordering food, talking to people. Lower, slower, clearer until it feels normal.</p></div>
+      <div class="phase" style="border-left-color:var(--p4)"><h3>Polish</h3><div class="days">Days 36–45</div><p>It's natural now. Focus on presence, storytelling, delivery, consistency. Record a 2-min speech and critique it.</p></div>
+    </div>
+  </section>
+
+  <!-- WEEKLY -->
+  <section>
+    <div class="head"><h2>Weekly benchmark read</h2><span class="note">record the same passage each week</span></div>
+    <p class="sub" style="margin-bottom:12px">Once a week, read the <em>same</em> paragraph and record it. Compare to last week — your ears are the coach. Tick when done.</p>
+    <div class="weeks" id="weeks"></div>
+  </section>
+
+  <!-- REFERENCE -->
+  <section>
+    <div class="head"><h2>Keep in mind</h2></div>
+    <div class="ref">
+      <h3>Charisma layer — tone alone isn't enough</h3>
+      <ul>
+        <li><b>Slow down ~20%.</b> Rushing pitches you up and sounds nervous.</li>
+        <li><b>Pause before key words.</b> A pause is power, and it lets your voice settle low.</li>
+        <li><b>Land sentences down.</b> Ending high (uptalk) kills authority.</li>
+        <li><b>Vary it.</b> Deep + monotone is boring. Use light and shade.</li>
+        <li><b>Cut fillers.</b> Silence beats "um / like / matlab".</li>
+      </ul>
+    </div>
+    <div class="ref warn">
+      <h3>Health guardrails — read every week</h3>
+      <ul>
+        <li><b>Never push into pain, strain, or hoarseness.</b> That's how vocal cords get damaged. Stop and rest.</li>
+        <li><b>Don't fake a low voice by forcing.</b> Find your relaxed low, don't manufacture it.</li>
+        <li><b>Hydrate, sleep, don't harshly clear your throat.</b> Voice recovers in sleep.</li>
+        <li><b>If nasality won't budge after 2–3 weeks,</b> it may be structural (e.g. deviated septum) — see an ENT or speech-language pathologist.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="reset-all"><button class="ghost" id="resetAll">Reset all progress</button></div>
+
+  <footer>Your progress saves automatically on this device.<br>Consistency &gt; intensity. Miss a day? Just do the next one.</footer>
+
+</div>
+
+<script>
+const CHK = '<svg viewBox="0 0 24 24" fill="none" stroke="#1a1420" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>';
+
+const STEPS = [
+  {id:'s1',t:'Reset',min:'2 min',d:'Sip warm water. Stand tall, drop your shoulders, unclench your jaw. Tension is the enemy of depth.'},
+  {id:'s2',t:'Breath',min:'5 min',d:'Hand on belly — breathe so the belly pushes out, not the chest. Exhale on a long, even "sssss". Track the seconds and grow it weekly. This fixes half the rushing.'},
+  {id:'s3',t:'Straw warm-up',min:'5 min',d:'Hum through a straw into a glass of water (make bubbles). Glide your pitch gently up and down. Then lip trills ("brrrr"). Safest, most effective warm-up there is.'},
+  {id:'s4',t:'Resonance & depth',min:'7 min',d:'Hand on chest. Hum low and chase the buzz. Do "ng → ahhh" (end of "sing" sliding open) — your core anti-nasal drill. Nose-pinch test: sustain "ahhh", pinch, release — a pure vowel should barely change.'},
+  {id:'s5',t:'Articulation',min:'6 min',d:'Over-exaggerate every consonant on tongue twisters ("red leather yellow leather", "unique New York"), then relax back to normal.',pencil:true},
+  {id:'s6',t:'Read aloud & record',min:'5 min',d:'Read a paragraph slowly and low, with real pauses, dropping your voice at the end of each sentence. Record it — that recording is your feedback.'}
+];
+
+const PHASE_OF = d => d<=7?1 : d<=21?2 : d<=35?3 : 4;
+const PHASE_NAME = {1:['Foundation','days 1–7'],2:['Build','days 8–21'],3:['Integrate','days 22–35'],4:['Polish','days 36–45']};
+
+let state = { days:{}, session:{}, sessionDay:1, weeks:{} };
+let mem = null; // in-memory fallback
+
+async function load(){
+  let raw = null;
+  try{ const r = await window.storage.get('voice45'); if(r && r.value) raw = r.value; }catch(e){}
+  if(raw === null){ try{ raw = localStorage.getItem('voice45'); }catch(e){} }
+  if(raw){ try{ state = Object.assign(state, JSON.parse(raw)); }catch(e){} }
+  state.sessionDay = firstIncomplete();
+}
+async function save(){
+  const payload = JSON.stringify(state);
+  mem = payload;
+  try{ await window.storage.set('voice45', payload); }catch(e){}   // inside Claude
+  try{ localStorage.setItem('voice45', payload); }catch(e){}       // self-hosted (GitHub etc.)
+}
+function firstIncomplete(){
+  for(let i=1;i<=45;i++) if(!state.days[i]) return i;
+  return 45;
+}
+
+/* ---- render ---- */
+function renderWave(){
+  const w=document.getElementById('wave'); w.innerHTML='';
+  const heights=[8,14,20,28,22,16,26,32,24,18,12,20,30,34,26,18,22,28,16,10,18,26,32,28,20,14,22,30,24,16,12,20,28,22,14,24,30,20,12,8];
+  heights.forEach(h=>{const s=document.createElement('span');s.style.height=h+'px';w.appendChild(s);});
+}
+function renderStats(){
+  const done=Object.values(state.days).filter(Boolean).length;
+  document.getElementById('stDone').innerHTML=done+'<small>/45</small>';
+  document.getElementById('stPct').innerHTML=Math.round(done/45*100)+'<small>%</small>';
+  document.getElementById('pbar').style.width=(done/45*100)+'%';
+  const ph=PHASE_OF(state.sessionDay);
+  document.getElementById('stPhase').textContent=PHASE_NAME[ph][0];
+  document.getElementById('stPhaseD').textContent=PHASE_NAME[ph][1];
+}
+function renderSession(){
+  document.getElementById('sessTitle').textContent='Today · Day '+state.sessionDay+' session';
+  const c=document.getElementById('sessionCard'); c.innerHTML='';
+  STEPS.forEach(st=>{
+    const done=!!state.session[st.id];
+    const el=document.createElement('div');
+    el.className='step'+(done?' done':'');
+    let inner=`<div class="box">${CHK}</div><div>
+      <div class="s-title">${st.t}<span class="t">${st.min}</span></div>
+      <div class="s-desc">${st.d}</div>`;
+    if(st.pencil){
+      inner+=`<div class="pencil"><b>Pencil drill:</b> hold a clean pen/pencil horizontally between your teeth (don't bite hard). Read a paragraph aloud, fighting to stay clear for ~1–2 min. Remove it and read the same lines — they'll feel crisp.
+        <div class="warnline">Keep your jaw relaxed. Max ~2 min. Stop if your jaw aches.</div></div>`;
+    }
+    inner+=`</div>`;
+    el.innerHTML=inner;
+    el.onclick=()=>{ state.session[st.id]=!state.session[st.id]; save(); renderSession(); };
+    c.appendChild(el);
+  });
+  const allDone=STEPS.every(s=>state.session[s.id]);
+  const foot=document.createElement('div');
+  foot.className='session-foot';
+  foot.innerHTML=`<button class="primary" ${allDone?'':'disabled'} id="completeBtn">Complete Day ${state.sessionDay}</button>
+    <button class="ghost" id="clearBtn">Clear</button>
+    <span class="foot-msg">${allDone?'Nice — lock it in.':'Finish all 6 to complete the day.'}</span>`;
+  c.appendChild(foot);
+  document.getElementById('completeBtn').onclick=()=>{ if(!allDone) return; completeDay(); };
+  document.getElementById('clearBtn').onclick=()=>{ state.session={}; save(); renderSession(); };
+}
+function completeDay(){
+  state.days[state.sessionDay]=true;
+  state.session={};
+  state.sessionDay=firstIncomplete();
+  save(); renderAll();
+}
+function renderGrid(){
+  const g=document.getElementById('grid'); g.innerHTML='';
+  for(let d=1;d<=45;d++){
+    const ph=PHASE_OF(d), done=!!state.days[d];
+    const el=document.createElement('div');
+    el.className=`cell p${ph}`+(done?' done':'')+(d===state.sessionDay?' today':'');
+    el.innerHTML=`<span class="d">${d}</span><span class="ph">${PHASE_NAME[ph][0].slice(0,4)}</span>`;
+    el.onclick=()=>{ state.days[d]=!state.days[d]; state.sessionDay=firstIncomplete(); save(); renderAll(); };
+    g.appendChild(el);
+  }
+}
+function renderWeeks(){
+  const w=document.getElementById('weeks'); w.innerHTML='';
+  for(let i=1;i<=7;i++){
+    const done=!!state.weeks[i];
+    const el=document.createElement('div');
+    el.className='wk'+(done?' done':'');
+    el.innerHTML=`<div class="wbox">${CHK}</div>Week ${i}`;
+    el.onclick=()=>{ state.weeks[i]=!state.weeks[i]; save(); renderWeeks(); };
+    w.appendChild(el);
+  }
+}
+function renderAll(){ renderStats(); renderSession(); renderGrid(); renderWeeks(); }
+
+document.getElementById('resetAll').onclick=async()=>{
+  if(!confirm('Reset all 45 days, sessions and weekly logs? This cannot be undone.')) return;
+  state={ days:{}, session:{}, sessionDay:1, weeks:{} };
+  await save(); renderAll();
+};
+
+(async()=>{ renderWave(); await load(); renderAll(); })();
+</script>
+</body>
+</html>
