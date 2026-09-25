@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17131f">
 <title>The 45 — Voice Training Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +14,7 @@
     --text:#f2ece1; --muted:#a89db8; --dim:#7a7089;
     --accent:#e0a13c; --accent-deep:#c8822a;
     --p1:#6f93a8; --p2:#4f9e86; --p3:#e0a13c; --p4:#e17a4f;
-    --ok:#4f9e86;
+    --ok:#4f9e86; --bad:#d9644a;
     --sans:'Inter',system-ui,sans-serif; --grot:'Space Grotesk',system-ui,sans-serif;
   }
   *{box-sizing:border-box}
@@ -21,7 +22,7 @@
   body{
     background:var(--bg); color:var(--text); font-family:var(--sans);
     line-height:1.5; -webkit-font-smoothing:antialiased;
-    padding:22px 18px 80px;
+    padding:22px 16px 80px;
   }
   .wrap{max-width:760px;margin:0 auto}
   a{color:var(--accent)}
@@ -32,50 +33,124 @@
   h1{font-family:var(--grot);font-weight:700;font-size:2.35rem;line-height:1.04;margin:.35rem 0 .3rem;letter-spacing:-.01em}
   .sub{color:var(--muted);max-width:52ch;margin:0 0 1.1rem}
   .wave{display:flex;align-items:flex-end;gap:3px;height:34px;margin:0 0 1.4rem;opacity:.55}
-  .wave span{width:3px;background:var(--accent);border-radius:2px;display:block}
+  .wave span{width:3px;background:var(--accent);border-radius:2px;display:block;transform-origin:bottom}
+  .wave.live span{animation:wv 1.1s ease-in-out infinite alternate}
+  @keyframes wv{from{transform:scaleY(.35)}to{transform:scaleY(1)}}
 
   .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:8px}
-  .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 15px}
-  .stat .num{font-family:var(--grot);font-weight:700;font-size:1.9rem;line-height:1}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 15px;min-width:0}
+  .stat .num{font-family:var(--grot);font-weight:700;font-size:1.9rem;line-height:1;white-space:nowrap}
   .stat .num small{font-size:.9rem;color:var(--dim);font-weight:500}
+  .stat .num.txt{font-size:1.15rem;padding-top:8px}
   .stat .lab{color:var(--muted);font-size:.78rem;margin-top:5px}
   .pbar{height:7px;border-radius:6px;background:var(--surface-2);overflow:hidden;margin:14px 0 0;border:1px solid var(--line)}
   .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--p1),var(--p2),var(--p3),var(--p4));transition:width .5s ease}
 
   section{margin-top:30px}
-  .head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
   .head h2{font-family:var(--grot);font-weight:600;font-size:1.15rem;margin:0}
   .head .note{color:var(--dim);font-size:.8rem}
 
+  /* SETTINGS CHIPS */
+  .toggles{display:flex;flex-wrap:wrap;gap:7px;margin:-2px 0 12px}
+  .tg{font-size:.76rem;font-weight:500;padding:6px 11px;border-radius:999px;background:transparent;border:1px solid var(--line);color:var(--dim)}
+  .tg.on{color:var(--text);border-color:var(--accent-deep);background:rgba(224,161,60,.1)}
+  .tg::before{content:'○ ';}
+  .tg.on::before{content:'● ';color:var(--accent)}
+
   /* SESSION */
   .card{background:var(--surface);border:1px solid var(--line);border-radius:16px}
-  .step{display:flex;gap:13px;padding:14px 16px;border-bottom:1px solid var(--line);cursor:pointer;align-items:flex-start}
-  .step:last-of-type{border-bottom:none}
-  .box{flex:none;width:22px;height:22px;border-radius:7px;border:1.5px solid var(--dim);margin-top:2px;display:grid;place-items:center;transition:.15s}
+  .focus{padding:14px 16px;border-bottom:1px solid var(--line);font-size:.86rem;color:var(--muted)}
+  .focus b{color:var(--text)}
+  .focus .tag{display:inline-block;font-family:var(--grot);font-size:.7rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:6px;margin-right:6px;color:#1a1420}
+  .focus .mission{margin-top:8px;padding:9px 11px;border-radius:10px;background:var(--surface-2);color:var(--text)}
+  .focus .banner{margin-top:8px;padding:9px 11px;border-radius:10px;border:1px solid var(--line)}
+  .focus .banner.warn{border-color:var(--bad);color:var(--text)}
+  .checkin{padding:14px 16px;border-bottom:1px solid var(--line)}
+  .checkin .q{font-weight:600;font-size:.92rem;margin-bottom:9px}
+  .checkin .opts{display:flex;gap:8px;flex-wrap:wrap}
+  .checkin .opts button{flex:1 1 150px;text-align:left;background:var(--surface-2);color:var(--text);border:1px solid var(--line);padding:10px 12px;font-weight:500;font-size:.85rem}
+  .checkin .opts button small{display:block;color:var(--dim);font-size:.74rem;font-weight:400;margin-top:1px}
+  .checkin .opts button:hover{border-color:var(--accent-deep)}
+  .mode-line{padding:10px 16px;border-bottom:1px solid var(--line);font-size:.82rem;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .linkbtn{background:none;border:none;padding:0;color:var(--accent);font-size:.82rem;font-weight:500;text-decoration:underline;cursor:pointer}
+
+  .step{display:flex;gap:13px;padding:14px 16px;border-bottom:1px solid var(--line);align-items:flex-start}
+  .step.active{background:linear-gradient(90deg,rgba(224,161,60,.07),transparent 60%)}
+  .step-body{flex:1;min-width:0}
+  .box{flex:none;width:24px;height:24px;border-radius:7px;border:1.5px solid var(--dim);margin-top:1px;display:grid;place-items:center;transition:.15s;background:transparent;padding:0;cursor:pointer}
   .box svg{width:13px;height:13px;opacity:0;transform:scale(.6);transition:.15s}
   .step.done .box{background:var(--ok);border-color:var(--ok)}
   .step.done .box svg{opacity:1;transform:scale(1)}
   .step.done .s-title{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--dim)}
-  .s-title{font-weight:600;font-size:.98rem}
+  .s-title{font-weight:600;font-size:.98rem;cursor:pointer}
   .s-title .t{font-family:var(--grot);color:var(--accent);font-weight:600;font-size:.82rem;margin-left:7px}
   .s-desc{color:var(--muted);font-size:.86rem;margin-top:3px}
   .pencil{margin-top:7px;padding:8px 11px;background:var(--surface-2);border:1px dashed var(--accent-deep);border-radius:10px;font-size:.83rem}
   .pencil b{color:var(--accent)}
   .warnline{color:var(--dim);font-size:.78rem;margin-top:4px}
 
+  /* TIMER */
+  .tm{margin-top:10px}
+  .tm-idle{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .tm-start{background:var(--surface-2);color:var(--text);border:1px solid var(--line);padding:8px 13px;font-size:.84rem;display:inline-flex;align-items:center;gap:7px}
+  .tm-start:hover{border-color:var(--accent)}
+  .tm-start .pl{color:var(--accent)}
+  .segs{display:flex;flex-wrap:wrap;gap:5px}
+  .seg{font-size:.72rem;color:var(--dim);background:var(--surface-2);border-radius:6px;padding:3px 7px;white-space:nowrap}
+  .seg.cur{color:#1a1420;background:var(--accent);font-weight:600}
+  .seg.past{text-decoration:line-through;opacity:.6}
+  .tm-live{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:13px}
+  .tm-row{display:flex;gap:14px;align-items:center}
+  .ring{flex:none;position:relative;width:86px;height:86px}
+  .ring svg{width:86px;height:86px;transform:rotate(-90deg)}
+  .ring .bg{stroke:var(--line)}
+  .ring .fg{stroke:var(--accent);transition:stroke-dashoffset .12s linear}
+  .ring .clock{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--grot);font-weight:700;font-size:1.2rem;font-variant-numeric:tabular-nums}
+  .tm-info{flex:1;min-width:0}
+  .tm-seg{font-weight:600;font-size:.95rem}
+  .tm-count{font-family:var(--grot);font-size:.72rem;color:var(--dim);letter-spacing:.03em}
+  .tm-tip{color:var(--muted);font-size:.82rem;margin-top:3px}
+  .tm-total{height:4px;border-radius:4px;background:var(--line);margin:12px 0 10px;overflow:hidden}
+  .tm-total i{display:block;height:100%;background:var(--accent);width:0}
+  .tm-ctrl{display:flex;gap:7px;flex-wrap:wrap}
+  .tm-ctrl button{padding:8px 12px;font-size:.82rem}
+  .tm-live.paused .ring .fg{stroke:var(--dim)}
+  .tm-live.lead .ring .fg{stroke:var(--p1)}
+  .pacer{display:flex;align-items:center;gap:12px;margin-top:12px}
+  .pacer .orb{width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 40% 35%,var(--p2),rgba(79,158,134,.25));transform:scale(.6);will-change:transform}
+  .pacer .plab{font-family:var(--grot);font-weight:600;font-size:.95rem}
+  .pacer .psub{font-size:.76rem;color:var(--dim)}
+
+  /* TOOLS inside steps */
+  .tool{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font-size:.84rem}
+  .tool .tl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .tool .big{font-family:var(--grot);font-weight:700;font-size:1.25rem;font-variant-numeric:tabular-nums;min-width:3.2ch}
+  .tool .meta{color:var(--dim);font-size:.78rem}
+  .tool button{padding:8px 12px;font-size:.82rem}
+  .rec-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--bad);margin-right:6px;animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:.25}}
+  audio{width:100%;height:36px;margin-top:8px}
+  details.passage{margin-top:8px;font-size:.83rem;color:var(--muted)}
+  details.passage summary{cursor:pointer;color:var(--accent);font-weight:500}
+  details.passage p{margin:6px 0 0;padding:9px 11px;background:var(--surface-2);border-radius:10px;color:var(--text)}
+  .spark{display:block;margin-top:6px}
+
   .session-foot{display:flex;gap:10px;align-items:center;padding:14px 16px;flex-wrap:wrap}
-  button{font-family:var(--sans);font-weight:600;font-size:.9rem;border:none;border-radius:11px;padding:11px 18px;cursor:pointer;transition:.15s}
+  button{font-family:var(--sans);font-weight:600;font-size:.9rem;border:none;border-radius:11px;padding:11px 18px;cursor:pointer;transition:.15s;color:inherit}
+  button:focus-visible,.cell:focus-visible,.wk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .primary{background:var(--accent);color:#241a08}
   .primary:disabled{background:var(--surface-2);color:var(--dim);cursor:not-allowed}
   .ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
   .ghost:hover{color:var(--text)}
+  .danger{background:var(--bad);color:#fff}
   .foot-msg{color:var(--muted);font-size:.84rem}
 
   /* GRID */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px}
   .cell{aspect-ratio:1;border-radius:11px;border:1px solid var(--line);background:var(--surface);
     display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;
-    font-family:var(--grot);position:relative;transition:transform .12s, background .2s}
+    font-family:var(--grot);position:relative;transition:transform .12s, background .2s;padding:0;color:inherit}
   .cell:hover{transform:translateY(-2px)}
   .cell .d{font-weight:600;font-size:1rem;color:var(--muted)}
   .cell .ph{font-size:.55rem;color:var(--dim);margin-top:1px}
@@ -93,13 +168,21 @@
   .phase h3{font-family:var(--grot);margin:0 0 3px;font-size:.98rem}
   .phase .days{color:var(--dim);font-size:.76rem;font-family:var(--grot)}
   .phase p{margin:7px 0 0;color:var(--muted);font-size:.85rem}
+  .phase.cur{box-shadow:0 0 0 1px var(--accent-deep)}
 
   /* WEEKS */
-  .weeks{display:flex;flex-wrap:wrap;gap:9px}
-  .wk{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 13px;cursor:pointer;font-size:.86rem}
-  .wk .wbox{width:17px;height:17px;border-radius:5px;border:1.5px solid var(--dim);display:grid;place-items:center}
-  .wk .wbox svg{width:10px;height:10px;opacity:0}
-  .wk.done{border-color:var(--ok)} .wk.done .wbox{background:var(--ok);border-color:var(--ok)} .wk.done .wbox svg{opacity:1}
+  .weeks{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:9px}
+  .wk{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:.86rem}
+  .wk.done{border-color:var(--ok)}
+  .wk-top{display:flex;align-items:center;gap:8px}
+  .wk-top .lbl{font-weight:600}
+  .wk-top .when{margin-left:auto;color:var(--dim);font-size:.74rem}
+  .wbox{flex:none;width:19px;height:19px;border-radius:5px;border:1.5px solid var(--dim);display:grid;place-items:center;background:transparent;padding:0;cursor:pointer}
+  .wbox svg{width:10px;height:10px;opacity:0}
+  .wk.done .wbox{background:var(--ok);border-color:var(--ok)} .wk.done .wbox svg{opacity:1}
+  .wk-act{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .wk-act button{padding:6px 10px;font-size:.76rem}
+  .wk audio{height:32px;margin-top:6px}
 
   /* REFERENCE */
   .ref{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px}
@@ -110,21 +193,29 @@
   .ref.warn{border-color:var(--accent-deep)}
   .ref.warn li b{color:var(--accent)}
 
-  .reset-all{margin-top:26px;text-align:center}
-  .reset-all button{font-size:.8rem}
+  .reset-all{margin-top:26px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .reset-all button{font-size:.8rem;padding:9px 14px}
   footer{margin-top:24px;color:var(--dim);font-size:.78rem;text-align:center;line-height:1.6}
+  kbd{font-family:var(--grot);font-size:.72rem;border:1px solid var(--line);border-radius:4px;padding:0 4px}
+
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--surface-2);border:1px solid var(--accent-deep);color:var(--text);padding:10px 16px;border-radius:12px;font-size:.86rem;transition:.25s;pointer-events:none;z-index:10;max-width:calc(100% - 32px)}
+  .toast.show{opacity:1;transform:translateX(-50%)}
 
   @media (max-width:520px){
     h1{font-size:1.95rem}
     .phases{grid-template-columns:1fr}
-    .stat .num{font-size:1.55rem}
+    .stat{padding:12px}
+    .stat .num{font-size:1.45rem}
+    .stat .num.txt{font-size:1rem}
+    .ring,.ring svg{width:74px;height:74px}
+    .ring .clock{font-size:1.05rem}
   }
-  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
   @media print{
     body{background:#fff;color:#000;padding:0}
     .card,.stat,.cell,.phase,.wk,.ref{background:#fff;border-color:#bbb;color:#000}
-    .wave,.session-foot button,.reset-all{display:none}
+    .wave,.session-foot button,.reset-all,.tm,.tool,.toggles,.checkin,.wk-act{display:none}
     .s-desc,.sub,.muted,.stat .lab{color:#333}
     h1,.head h2,.brand b,.s-title .t{color:#000}
   }
@@ -135,14 +226,17 @@
 
   <div class="brand"><b>THE 45</b> · voice rebuild protocol</div>
   <h1>Deeper. Clearer.<br>On purpose.</h1>
-  <p class="sub">A 45-day daily protocol to fix rushed, nasal, pitched-up speech and build a calm, resonant, charismatic voice. One session a day. Tick it off. Watch the grid fill.</p>
+  <p class="sub">A 45-day daily protocol to fix rushed, nasal, pitched-up speech and build a calm, resonant, charismatic voice. One guided session a day. Hit start, follow the timer, watch the grid fill.</p>
 
   <div class="wave" id="wave" aria-hidden="true"></div>
 
   <div class="stats">
     <div class="stat"><div class="num" id="stDone">0<small>/45</small></div><div class="lab">days completed</div></div>
     <div class="stat"><div class="num" id="stPct">0<small>%</small></div><div class="lab">of protocol done</div></div>
-    <div class="stat"><div class="num" id="stPhase" style="font-size:1.15rem;padding-top:8px">Foundation</div><div class="lab" id="stPhaseD">days 1–7</div></div>
+    <div class="stat"><div class="num txt" id="stPhase">Foundation</div><div class="lab" id="stPhaseD">days 1–7</div></div>
+    <div class="stat"><div class="num" id="stStreak">0</div><div class="lab" id="stStreakL">day streak</div></div>
+    <div class="stat"><div class="num" id="stMin">0<small>min</small></div><div class="lab">timed practice</div></div>
+    <div class="stat"><div class="num" id="stEx">–</div><div class="lab" id="stExL">best “sss” exhale</div></div>
   </div>
   <div class="pbar"><i id="pbar"></i></div>
 
@@ -150,8 +244,9 @@
   <section>
     <div class="head">
       <h2 id="sessTitle">Today · Day 1 session</h2>
-      <span class="note">~25–30 min</span>
+      <span class="note" id="sessNote">~25–30 min</span>
     </div>
+    <div class="toggles" id="toggles"></div>
     <div class="card" id="sessionCard"></div>
   </section>
 
@@ -169,19 +264,20 @@
 
   <!-- PHASES -->
   <section>
-    <div class="head"><h2>What each phase is for</h2></div>
-    <div class="phases">
-      <div class="phase" style="border-left-color:var(--p1)"><h3>Foundation</h3><div class="days">Days 1–7</div><p>Relax, breathe from the belly, find your true low pitch. Don't force depth yet — just build the habit and feel chest vibration.</p></div>
-      <div class="phase" style="border-left-color:var(--p2)"><h3>Build</h3><div class="days">Days 8–21</div><p>Attack nasality hard (ng→ah + pinch test). Extend breath. Ramp articulation. Start slowing down in real conversations.</p></div>
-      <div class="phase" style="border-left-color:var(--p3)"><h3>Integrate</h3><div class="days">Days 22–35</div><p>Carry the practice voice into real life — calls, ordering food, talking to people. Lower, slower, clearer until it feels normal.</p></div>
-      <div class="phase" style="border-left-color:var(--p4)"><h3>Polish</h3><div class="days">Days 36–45</div><p>It's natural now. Focus on presence, storytelling, delivery, consistency. Record a 2-min speech and critique it.</p></div>
+    <div class="head"><h2>What each phase is for</h2><span class="note">timers adapt to your phase</span></div>
+    <div class="phases" id="phases">
+      <div class="phase" data-ph="1" style="border-left-color:var(--p1)"><h3>Foundation</h3><div class="days">Days 1–7</div><p>Relax, breathe from the belly, find your true low pitch. Don't force depth yet — just build the habit and feel chest vibration.</p></div>
+      <div class="phase" data-ph="2" style="border-left-color:var(--p2)"><h3>Build</h3><div class="days">Days 8–21</div><p>Attack nasality hard (ng→ah + pinch test). Extend breath. Ramp articulation. Start slowing down in real conversations.</p></div>
+      <div class="phase" data-ph="3" style="border-left-color:var(--p3)"><h3>Integrate</h3><div class="days">Days 22–35</div><p>Carry the practice voice into real life — calls, ordering food, talking to people. Lower, slower, clearer until it feels normal.</p></div>
+      <div class="phase" data-ph="4" style="border-left-color:var(--p4)"><h3>Polish</h3><div class="days">Days 36–45</div><p>It's natural now. Focus on presence, storytelling, delivery, consistency. Record a 2-min speech and critique it.</p></div>
     </div>
   </section>
 
   <!-- WEEKLY -->
   <section>
     <div class="head"><h2>Weekly benchmark read</h2><span class="note">record the same passage each week</span></div>
-    <p class="sub" style="margin-bottom:12px">Once a week, read the <em>same</em> paragraph and record it. Compare to last week — your ears are the coach. Tick when done.</p>
+    <p class="sub" style="margin-bottom:10px">Once a week, record the <em>same</em> paragraph right here. Play Week 1 next to this week — your ears are the coach. Recordings stay on this device.</p>
+    <details class="passage" style="margin:0 0 12px"><summary>Show the benchmark passage</summary><p id="passageW"></p></details>
     <div class="weeks" id="weeks"></div>
   </section>
 
@@ -209,129 +305,660 @@
     </div>
   </section>
 
-  <div class="reset-all"><button class="ghost" id="resetAll">Reset all progress</button></div>
+  <div class="reset-all">
+    <button class="ghost" id="exportBtn">Export backup</button>
+    <button class="ghost" id="importBtn">Import backup</button>
+    <button class="ghost" id="resetAll">Reset all progress</button>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+  </div>
 
-  <footer>Your progress saves automatically on this device.<br>Consistency &gt; intensity. Miss a day? Just do the next one.</footer>
+  <footer>Your progress saves automatically on this device.<br>
+    Shortcuts: <kbd>Space</kbd> start/pause timer · <kbd>N</kbd> next segment<br>
+    Consistency &gt; intensity. Miss a day? Just do the next one.</footer>
 
 </div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 const CHK = '<svg viewBox="0 0 24 24" fill="none" stroke="#1a1420" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>';
-
-const STEPS = [
-  {id:'s1',t:'Reset',min:'2 min',d:'Sip warm water. Stand tall, drop your shoulders, unclench your jaw. Tension is the enemy of depth.'},
-  {id:'s2',t:'Breath',min:'5 min',d:'Hand on belly — breathe so the belly pushes out, not the chest. Exhale on a long, even "sssss". Track the seconds and grow it weekly. This fixes half the rushing.'},
-  {id:'s3',t:'Straw warm-up',min:'5 min',d:'Hum through a straw into a glass of water (make bubbles). Glide your pitch gently up and down. Then lip trills ("brrrr"). Safest, most effective warm-up there is.'},
-  {id:'s4',t:'Resonance & depth',min:'7 min',d:'Hand on chest. Hum low and chase the buzz. Do "ng → ahhh" (end of "sing" sliding open) — your core anti-nasal drill. Nose-pinch test: sustain "ahhh", pinch, release — a pure vowel should barely change.'},
-  {id:'s5',t:'Articulation',min:'6 min',d:'Over-exaggerate every consonant on tongue twisters ("red leather yellow leather", "unique New York"), then relax back to normal.',pencil:true},
-  {id:'s6',t:'Read aloud & record',min:'5 min',d:'Read a paragraph slowly and low, with real pauses, dropping your voice at the end of each sentence. Record it — that recording is your feedback.'}
-];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = sec => { sec = Math.max(0, Math.ceil(sec)); return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0'); };
+const ymd = (dt = new Date()) => dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+const dayDiff = (a, b) => Math.round((new Date(b+'T00:00') - new Date(a+'T00:00')) / 864e5);
 
 const PHASE_OF = d => d<=7?1 : d<=21?2 : d<=35?3 : 4;
 const PHASE_NAME = {1:['Foundation','days 1–7'],2:['Build','days 8–21'],3:['Integrate','days 22–35'],4:['Polish','days 36–45']};
+const PHASE_FOCUS = {
+  1:'Relaxed, not forced. Your only job is to feel the chest buzz and breathe low. Short, easy timers this week.',
+  2:'Nasality hunt. The ng → ahhh block is longer now — pinch-test every vowel. Push the “sss” exhale a few seconds further each day.',
+  3:'Take it outside. Today\'s session ends by rehearsing a real-life mission — then go do it for real.',
+  4:'Presence and delivery. Record a full talk, critique it honestly, then do it again better.'
+};
+const TWISTERS = [
+  'Red leather, yellow leather','Unique New York, you know you need unique New York','The lips, the teeth, the tip of the tongue',
+  'Peter Piper picked a peck of pickled peppers','She sells seashells by the seashore','Irish wristwatch, Swiss wristwatch',
+  'Good blood, bad blood','Six slick slim sycamore saplings','Which witch is which?','A proper copper coffee pot',
+  'Toy boat, toy boat, toy boat','Truly rural, truly rural'
+];
+const MISSIONS = {
+  3:['Order food or coffee in your low, slow voice.','Make one phone call — pause before the key words.','Tell someone about your day and land every sentence down.',
+     'Send a voice note to a friend, then listen back to it.','Ask a stranger a simple question (directions, the time) calmly.','In one conversation, cut every filler — use silence instead.',
+     'Read a news article aloud as if you were presenting it.','Speak 20% slower in every conversation until lunch.','Introduce yourself to someone new — say your name slow and low.',
+     'Explain something you know well to someone, with deliberate pauses.','On a call, keep your voice from rising at the end of questions.','Record a 1-minute video about your goals.',
+     'Say no to something, calmly and low, without over-explaining.','Tell a short story at a meal — vary light and shade.'],
+  4:['Give a 2-minute talk on a topic you love. Critique pace, pitch drop and fillers.','Tell a story with a clear setup, a pause, and a punchline.','Give a 60-second “who I am” pitch. Three takes, best one wins.',
+     'Read a poem or monologue with deliberate emotion shifts.','Record the benchmark passage and compare it to Week 1.','Speak with presence: stillness, eye contact, one idea per sentence.',
+     'Deliver a toast or thank-you speech out loud (1–2 min).','Argue a point calmly — lower and slower as it heats up.','Teach something in 2 minutes as if to a room of people.',
+     'Final speech: 2 minutes, recorded. Compare it to Day 1. You earned this.']
+};
+const PASSAGE = 'When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon.';
+const MODES = {
+  full:{label:'Full session',sub:'Voice feels fresh'},
+  light:{label:'Lighter session',sub:'Tired — timers ~60%, no pencil'},
+  rest:{label:'Recovery session',sub:'Sore or hoarse — gentle only'}
+};
 
-let state = { days:{}, session:{}, sessionDay:1, weeks:{} };
-let mem = null; // in-memory fallback
+/* ---------- session plan (adapts to phase + how your voice feels) ---------- */
+function seg(n, s, tip, extra){ return Object.assign({n, s, tip}, extra || {}); }
+function missionFor(day){ const ph = PHASE_OF(day); if(ph < 3) return null; const list = MISSIONS[ph]; return list[(day - (ph===3?22:36)) % list.length]; }
+function twistersFor(day){ return [TWISTERS[(day-1) % TWISTERS.length], TWISTERS[(day+4) % TWISTERS.length]]; }
+
+function buildPlan(day, mode){
+  const ph = PHASE_OF(day), tw = twistersFor(day), mission = missionFor(day);
+  const s4 = ph===1 ? [seg('Chest hum — chase the buzz',180,'Hand on chest. Hum low and easy until you feel it vibrate. Don\'t push down.'), seg('ng → ahhh slides',150,'Start on the “ng” of “sing”, then slide open to “ahhh”. Keep the sound out of your nose.'), seg('Nose-pinch test',90,'Sustain “ahhh”, pinch your nose, release. A clean vowel barely changes.')]
+          : ph===2 ? [seg('Chest hum',120,'Find the buzz first, then keep it as you open up.'), seg('ng → ahhh slides',240,'Core anti-nasal drill — longer this phase. Slow slides, open throat, jaw loose.'), seg('Nose-pinch test',120,'Pinch-test every vowel: ah, eh, ee, oh, oo. Any that changes needs more work.')]
+          :          [seg('Chest hum',120,'Quick buzz check — this should feel easy now.'), seg('ng → ahhh slides',180,'Keep the space open as you move into words: “sing-ahh”, “long-away”.'), seg('Pinch test on sentences',120,'Say full sentences with no m/n sounds while pinching. They should sound identical.')];
+  const s6 = ph<=2 ? [seg('Slow, low read with pauses',180,'Read the passage below. Pause at commas, drop your pitch at every full stop.'), seg('Record & listen back',120,'Record 30–60 s with the recorder below. Listen once and pick one thing to fix tomorrow.')]
+          : ph===3 ? [seg('Rehearse today\'s mission',180,mission), seg('Record & listen back',120,'Record your rehearsal. Low, slow, landed — then go do it for real today.')]
+          :          [seg('2-minute talk',180,mission), seg('Record, critique, re-do',180,'Listen back: pace, pauses, pitch at sentence ends, fillers. Then one better take.')];
+  let steps = [
+    {id:'s1',t:'Reset',d:'Sip warm water. Stand tall, drop your shoulders, unclench your jaw. Tension is the enemy of depth.',
+      segs:[seg('Warm water + tall posture',60,'Sip warm water. Stand tall, shoulders down and back.'), seg('Jaw & neck release',60,'Unclench the jaw, slow neck rolls, a few easy yawn-sighs.')]},
+    {id:'s2',t:'Breath',exhale:true,d:'Breathe so the belly pushes out, not the chest. Exhale on a long, even “sssss”. Log your best exhale below — it grows weekly and fixes half the rushing.',
+      segs:[seg('Belly breathing',120,'Hand on belly. Follow the pacer — belly out on the inhale, chest stays still.',{pacer:[4,6]}), seg('Timed “sssss” exhales',ph>=2?240:180,'Big belly breath, then a long, even “sssss”. Use the exhale timer below to log each one.')]},
+    {id:'s3',t:'Straw warm-up',d:'Hum through a straw into a glass of water (make bubbles), gliding pitch gently up and down. Then lip trills. Safest, most effective warm-up there is.',
+      segs:[seg('Straw bubbles + pitch glides',180,'Hum through a straw into water. Glide slowly low → high → low.'), seg('Lip trills',120,'“Brrrr” on easy slides. Loose lips, steady airflow.')]},
+    {id:'s4',t:'Resonance & depth',d:'Chase the chest buzz, then drill “ng → ahhh” — your core anti-nasal exercise — and verify with the nose-pinch test.',segs:s4},
+    {id:'s5',t:'Articulation',pencil:true,d:`Over-exaggerate every consonant, then relax back to normal. Today: “${tw[0]}” · “${tw[1]}”.`,
+      segs:[seg('Exaggerated tongue twisters',120,`“${tw[0]}” → “${tw[1]}”. Big mouth, crisp consonants, slow first then faster.`), seg('Pencil drill',ph===1?60:120,'Pen between the teeth, read aloud, fight for clarity. Jaw relaxed — stop if it aches.',{pencil:true}), seg('Relaxed normal read',120,'Pencil out. Read the same lines normally — notice how crisp they feel.')]},
+    {id:'s6',t:ph===3?'Rehearse & record':ph===4?'Speech & critique':'Read aloud & record',recorder:true,
+      d:ph<=2?'Read slowly and low, with real pauses, dropping your voice at the end of each sentence. Record it — that recording is your feedback.'
+        :'Rehearse out loud in your practice voice, record it, and listen back like a coach.',
+      segs:s6}
+  ];
+  if(mode === 'light'){
+    steps.forEach(s => { s.segs = s.segs.filter(g => !g.pencil).map(g => Object.assign({}, g, {s: Math.max(30, Math.round(g.s*0.6/15)*15)})); });
+  } else if(mode === 'rest'){
+    steps = [
+      Object.assign({}, steps[0], {segs:[seg('Warm water + gentle posture',90,'Small sips of warm water. No throat clearing — swallow instead.')]}),
+      Object.assign({}, steps[1], {exhale:false, d:'Slow belly breathing only. No sound, no effort.', segs:[seg('Silent belly breathing',180,'Follow the pacer. Long, quiet exhales.',{pacer:[4,6]})]}),
+      Object.assign({}, steps[2], {d:'The straw is the one exercise that actually helps a tired voice recover. Keep it quiet and comfortable.', segs:[seg('Gentle straw bubbles',180,'Quiet, comfortable pitch. Small glides only. Stop if anything scratches.')]})
+    ];
+  }
+  steps.forEach(s => { s.total = s.segs.reduce((a, g) => a + g.s, 0); s.hasPencil = s.segs.some(g => g.pencil); });
+  return steps;
+}
+
+/* ---------- state ---------- */
+const DEFAULT_SETTINGS = {sound:true, voice:false, autoNext:true, wake:true};
+function freshState(){ return { days:{}, dates:{}, session:{}, sessionDay:1, weeks:{}, weekDates:{}, exhale:{}, practice:{}, rest:{}, checkins:{}, settings:Object.assign({}, DEFAULT_SETTINGS), timerSnap:null }; }
+let state = freshState();
 
 async function load(){
   let raw = null;
   try{ const r = await window.storage.get('voice45'); if(r && r.value) raw = r.value; }catch(e){}
   if(raw === null){ try{ raw = localStorage.getItem('voice45'); }catch(e){} }
-  if(raw){ try{ state = Object.assign(state, JSON.parse(raw)); }catch(e){} }
+  if(raw){ try{ mergeState(JSON.parse(raw)); }catch(e){} }
   state.sessionDay = firstIncomplete();
 }
+function mergeState(obj){
+  if(!obj || typeof obj !== 'object') return;
+  const f = freshState();
+  for(const k of Object.keys(f)){
+    if(obj[k] === undefined) continue;
+    if(k === 'settings') state.settings = Object.assign({}, DEFAULT_SETTINGS, obj.settings);
+    else state[k] = obj[k];
+  }
+  for(const k of Object.keys(f)) if(state[k] === null && k !== 'timerSnap') state[k] = f[k];
+}
+let saveQueued = false;
 async function save(){
+  if(T) state.timerSnap = {stepId:T.stepId, day:state.sessionDay, idx:T.idx, rem:T.running ? T.endAt - Date.now() : T.rem, segs:T.segs};
+  else state.timerSnap = null;
   const payload = JSON.stringify(state);
-  mem = payload;
   try{ await window.storage.set('voice45', payload); }catch(e){}   // inside Claude
   try{ localStorage.setItem('voice45', payload); }catch(e){}       // self-hosted (GitHub etc.)
 }
-function firstIncomplete(){
-  for(let i=1;i<=45;i++) if(!state.days[i]) return i;
-  return 45;
+function firstIncomplete(){ for(let i=1;i<=45;i++) if(!state.days[i]) return i; return 45; }
+function todayMode(){ const c = state.checkins[ymd()]; return MODES[c] ? c : null; }
+function plan(){ return buildPlan(state.sessionDay, todayMode() || 'full'); }
+
+/* ---------- stats helpers ---------- */
+function activeDates(){
+  const s = new Set();
+  Object.entries(state.dates).forEach(([d, v]) => { if(state.days[d] && typeof v === 'string') s.add(v); });
+  Object.keys(state.rest).forEach(d => s.add(d));
+  return s;
+}
+function streaks(){
+  const s = activeDates();
+  let cur = 0; const d = new Date();
+  if(!s.has(ymd(d))) d.setDate(d.getDate()-1);
+  while(s.has(ymd(d))){ cur++; d.setDate(d.getDate()-1); }
+  let best = 0, run = 0, prev = null;
+  [...s].sort().forEach(x => { run = (prev && dayDiff(prev, x) === 1) ? run+1 : 1; best = Math.max(best, run); prev = x; });
+  return {cur, best, last: prev};
+}
+function exhaleBest(){ let best = 0, day = null; Object.entries(state.exhale).forEach(([d, v]) => { if(v > best){ best = v; day = d; } }); return {best, day}; }
+function practiceMin(){ return Math.round(Object.values(state.practice).reduce((a, b) => a + (+b || 0), 0) / 60); }
+
+/* ---------- sound, voice, vibration, wake lock ---------- */
+let actx = null;
+function unlockAudio(){ try{ actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if(actx.state === 'suspended') actx.resume(); }catch(e){} }
+function tone(freq, dur = .16, when = 0, vol = .22){
+  if(!state.settings.sound || !actx) return;
+  try{
+    const t = actx.currentTime + when, o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine'; o.frequency.value = freq;
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t+.02); g.gain.exponentialRampToValueAtTime(.0001, t+dur);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t+dur+.05);
+  }catch(e){}
+}
+const chime = { tick:()=>tone(660,.08,0,.12), seg:()=>{tone(784,.18);tone(1046,.25,.16);}, done:()=>{tone(523,.2);tone(659,.2,.17);tone(784,.2,.34);tone(1046,.4,.51);} };
+function say(text){
+  if(!state.settings.voice || !('speechSynthesis' in window)) return;
+  try{ speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.rate = .95; speechSynthesis.speak(u); }catch(e){}
+}
+function buzz(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
+let wakeLock = null;
+async function wake(on){
+  try{
+    if(on && state.settings.wake && 'wakeLock' in navigator && !wakeLock){ wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); }
+    if(!on && wakeLock){ await wakeLock.release(); wakeLock = null; }
+  }catch(e){}
 }
 
-/* ---- render ---- */
+/* ---------- smart timer engine ---------- */
+// T = {stepId, segs:[{n,s,tip,pacer?,lead?}], idx, endAt, rem, running, lastTick, lastBeep}
+let T = null, loop = null, lastPersist = 0;
+function curSeg(){ return T && T.segs[T.idx]; }
+function segLeft(){ return T.running ? (T.endAt - Date.now()) / 1000 : T.rem / 1000; }
+
+function startStep(stepId, lead = false){
+  const st = plan().find(s => s.id === stepId); if(!st) return;
+  unlockAudio();
+  const segs = (lead ? [{n:'Get ready', s:5, tip:'Next up: '+st.t, lead:true}] : []).concat(st.segs);
+  T = {stepId, segs, idx:0, rem:segs[0].s*1000, running:false, lastBeep:null};
+  resumeT(true);
+  const el = $('step-'+stepId); if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+function resumeT(fresh){
+  if(!T) return; unlockAudio();
+  T.running = true; T.endAt = Date.now() + T.rem; T.lastTick = Date.now();
+  if(!loop) loop = setInterval(tick, 100);
+  wake(true);
+  if(fresh) announceSeg();
+  renderSession(); renderChrome();
+}
+function pauseT(){
+  if(!T || !T.running) return;
+  T.rem = Math.max(0, T.endAt - Date.now()); T.running = false;
+  wake(false); save(); renderTimer(); renderChrome();
+}
+function toggleT(){ if(!T) return; T.running ? pauseT() : resumeT(false); }
+function killT(){ T = null; wake(false); }
+function stopT(){ killT(); save(); renderSession(); renderChrome(); }
+function addTime(sec){
+  if(!T) return;
+  if(T.running) T.endAt += sec*1000; else T.rem += sec*1000;
+  T.segs[T.idx] = Object.assign({}, T.segs[T.idx], {s: T.segs[T.idx].s + sec});
+  renderTimer();
+}
+function nextSeg(){
+  if(!T) return;
+  if(T.idx >= T.segs.length-1){ finishStep(); return; }
+  T.idx++; T.rem = T.segs[T.idx].s*1000; T.lastBeep = null;
+  if(T.running) T.endAt = Date.now() + T.rem;
+  announceSeg(); renderTimer(); save();
+}
+function announceSeg(){
+  const g = curSeg(); if(!g) return;
+  if(g.lead){ say(g.tip); chime.tick(); }
+  else { chime.seg(); buzz(120); say(g.n); }
+}
+function tick(){
+  if(!T || !T.running){ return; }
+  const now = Date.now();
+  const g = curSeg();
+  if(!g.lead){ const k = ymd(); state.practice[k] = (state.practice[k] || 0) + (now - T.lastTick)/1000; }
+  T.lastTick = now;
+  // advance through any segments that ended (also covers time spent in a background tab)
+  while(T.endAt <= now){
+    if(T.idx >= T.segs.length-1){ finishStep(); return; }
+    T.idx++; T.endAt += T.segs[T.idx].s*1000; T.lastBeep = null;
+    announceSeg(); renderTimer();
+  }
+  const left = (T.endAt - now)/1000, whole = Math.ceil(left);
+  if(whole <= 3 && whole >= 1 && T.lastBeep !== whole){ T.lastBeep = whole; chime.tick(); }
+  if(now - lastPersist > 5000){ lastPersist = now; save(); }
+  paintTimer();
+}
+function finishStep(){
+  const id = T.stepId;
+  T = null; wake(false);
+  state.session[id] = true;
+  chime.done(); buzz([80,60,80]);
+  const steps = plan(), next = steps.find(s => !state.session[s.id]);
+  save();
+  if(!next){ say('Session complete. Nice work.'); toast('All steps done — lock the day in below.'); }
+  renderSession(); renderStats(); renderChrome();
+  if(next && state.settings.autoNext){ startStep(next.id, true); }
+  else if(next){ say(steps.find(s => s.id === id).t + ' done.'); }
+}
+
+/* ---------- exhale stopwatch ---------- */
+let EX = null; // {start}
+let exTimer = null;
+function toggleExhale(){
+  unlockAudio();
+  if(!EX){ EX = {start: Date.now()}; tone(880,.1); exTimer = setInterval(paintExhale, 100); renderExhale(); return; }
+  const secs = Math.round((Date.now() - EX.start)/100)/10;
+  clearInterval(exTimer); EX = null;
+  if(secs >= 2){
+    const d = state.sessionDay, prevPB = exhaleBest().best;
+    state.exhale[d] = Math.max(state.exhale[d] || 0, secs);
+    save();
+    if(secs > prevPB && prevPB > 0){ chime.done(); toast('New personal best: '+secs+' s 🎉'); }
+    else toast('Logged '+secs+' s exhale');
+  }
+  renderExhale(); renderStats();
+}
+function paintExhale(){ const el = $('exBig'); if(el && EX) el.textContent = ((Date.now() - EX.start)/1000).toFixed(1)+'s'; }
+function sparkSVG(){
+  const pts = Object.entries(state.exhale).map(([d, v]) => [+d, +v]).filter(p => p[1] > 0).sort((a, b) => a[0] - b[0]);
+  if(pts.length < 2) return '';
+  const W = 220, H = 36, max = Math.max(...pts.map(p => p[1])), min = Math.min(...pts.map(p => p[1]));
+  const x = d => 4 + (d-1)/44*(W-8), y = v => H - 4 - (max === min ? .5 : (v-min)/(max-min))*(H-8);
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + x(p[0]).toFixed(1) + ' ' + y(p[1]).toFixed(1)).join(' ');
+  const last = pts[pts.length-1];
+  return `<svg class="spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Exhale trend"><path d="${path}" fill="none" stroke="var(--p2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${x(last[0])}" cy="${y(last[1])}" r="3" fill="var(--accent)"/></svg>`;
+}
+function exhaleHTML(){
+  const today = state.exhale[state.sessionDay], pb = exhaleBest();
+  const first = Object.entries(state.exhale).sort((a, b) => a[0]-b[0])[0];
+  const gain = first && pb.best > first[1] ? ` · +${Math.round((pb.best - first[1])*10)/10}s since Day ${esc(first[0])}` : '';
+  return `<div class="tl"><button class="${EX?'danger':'ghost'}" data-act="exhale">${EX?'■ Stop':'▶ Start “sss”'}</button>
+    <span class="big" id="exBig">${EX ? '0.0s' : (today ? esc(today)+'s' : '–')}</span>
+    <span class="meta">${EX ? 'Keep it even… tap stop when the air runs out' : 'today\'s best'}${pb.best ? ` · PB ${esc(pb.best)}s (Day ${esc(pb.day)})` : ''}${gain}</span></div>${sparkSVG()}`;
+}
+function renderExhale(){ const el = $('exTool'); if(el) el.innerHTML = exhaleHTML(); }
+
+/* ---------- audio recorder + benchmark storage ---------- */
+const REC = {rec:null, stream:null, target:null, start:0, timer:null};
+let sessionClipUrl = null;
+const clipUrls = {};
+function idb(){
+  return new Promise((res, rej) => {
+    try{ const r = indexedDB.open('voice45-audio', 1); r.onupgradeneeded = () => r.result.createObjectStore('clips'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }catch(e){ rej(e); }
+  });
+}
+async function clipPut(key, blob){ try{ const db = await idb(); await new Promise((res, rej) => { const tx = db.transaction('clips', 'readwrite'); tx.objectStore('clips').put(blob, key); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); return true; }catch(e){ return false; } }
+async function clipGet(key){ try{ const db = await idb(); return await new Promise((res, rej) => { const r = db.transaction('clips').objectStore('clips').get(key); r.onsuccess = () => res(r.result || null); r.onerror = () => rej(r.error); }); }catch(e){ return null; } }
+async function clipDel(key){ try{ const db = await idb(); db.transaction('clips', 'readwrite').objectStore('clips').delete(key); }catch(e){} }
+async function clipClear(){ try{ const db = await idb(); db.transaction('clips', 'readwrite').objectStore('clips').clear(); }catch(e){} }
+
+async function startRec(target){
+  if(REC.rec) return;
+  if(!navigator.mediaDevices || !window.MediaRecorder){ toast('Recording isn\'t supported in this browser — use your phone\'s voice memo app.'); return; }
+  try{
+    REC.stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false, noiseSuppression:false, autoGainControl:false}});
+  }catch(e){ toast('Microphone permission was blocked.'); return; }
+  const chunks = [];
+  REC.rec = new MediaRecorder(REC.stream); REC.target = target; REC.start = Date.now();
+  REC.rec.ondataavailable = e => { if(e.data.size) chunks.push(e.data); };
+  REC.rec.onstop = async () => {
+    const blob = new Blob(chunks, {type: REC.rec.mimeType || 'audio/webm'});
+    REC.stream.getTracks().forEach(t => t.stop());
+    const tgt = REC.target;
+    REC.rec = null; REC.stream = null; REC.target = null; clearInterval(REC.timer);
+    if(tgt === 'session'){
+      if(sessionClipUrl) URL.revokeObjectURL(sessionClipUrl);
+      sessionClipUrl = URL.createObjectURL(blob);
+      window._sessionBlob = blob;
+      renderRecTool();
+    } else {
+      await saveWeekClip(tgt, blob);
+    }
+  };
+  REC.rec.start();
+  REC.timer = setInterval(() => { const el = document.querySelector('[data-rec-time]'); if(el) el.textContent = fmt((Date.now()-REC.start)/1000); }, 250);
+  renderRecTool(); renderWeeks();
+}
+function stopRec(){ if(REC.rec && REC.rec.state !== 'inactive') REC.rec.stop(); }
+async function saveWeekClip(week, blob){
+  const ok = await clipPut('week-'+week, blob);
+  if(clipUrls[week]) URL.revokeObjectURL(clipUrls[week]);
+  clipUrls[week] = URL.createObjectURL(blob);
+  state.weeks[week] = true; state.weekDates[week] = ymd(); save();
+  toast(ok ? `Week ${week} benchmark saved` : `Week ${week} recorded (couldn't save permanently in this browser)`);
+  renderWeeks(); renderRecTool();
+}
+function currentWeek(){ return Math.min(7, Math.ceil(state.sessionDay/7)); }
+function recToolHTML(){
+  const recording = REC.rec && REC.target === 'session';
+  let h = `<div class="tl">`;
+  if(recording) h += `<button class="danger" data-act="rec-stop">■ Stop</button><span><span class="rec-dot"></span><span data-rec-time>0:00</span> recording…</span>`;
+  else h += `<button class="ghost" data-act="rec-start" ${REC.rec?'disabled':''}>● ${sessionClipUrl?'Record again':'Record'}</button>`;
+  if(sessionClipUrl && !recording) h += `<button class="ghost" data-act="rec-bench">Save as Week ${currentWeek()} benchmark</button>`;
+  h += `</div>`;
+  if(sessionClipUrl && !recording) h += `<audio controls src="${sessionClipUrl}"></audio>`;
+  h += `<details class="passage"><summary>Reading passage</summary><p>${esc(PASSAGE)}</p></details>`;
+  return h;
+}
+function renderRecTool(){ const el = $('recTool'); if(el) el.innerHTML = recToolHTML(); }
+
+/* ---------- render ---------- */
 function renderWave(){
-  const w=document.getElementById('wave'); w.innerHTML='';
-  const heights=[8,14,20,28,22,16,26,32,24,18,12,20,30,34,26,18,22,28,16,10,18,26,32,28,20,14,22,30,24,16,12,20,28,22,14,24,30,20,12,8];
-  heights.forEach(h=>{const s=document.createElement('span');s.style.height=h+'px';w.appendChild(s);});
+  const w = $('wave'); w.innerHTML = '';
+  const heights = [8,14,20,28,22,16,26,32,24,18,12,20,30,34,26,18,22,28,16,10,18,26,32,28,20,14,22,30,24,16,12,20,28,22,14,24,30,20,12,8];
+  heights.forEach((h, i) => { const s = document.createElement('span'); s.style.height = h+'px'; s.style.animationDelay = (i*37 % 900)+'ms'; w.appendChild(s); });
+}
+function renderChrome(){
+  $('wave').classList.toggle('live', !!(T && T.running));
+  if(T){ const g = curSeg(); document.title = (T.running ? '▶ ' : '❚❚ ') + fmt(segLeft()) + ' · ' + g.n + ' — The 45'; }
+  else document.title = 'The 45 — Voice Training Tracker';
 }
 function renderStats(){
-  const done=Object.values(state.days).filter(Boolean).length;
-  document.getElementById('stDone').innerHTML=done+'<small>/45</small>';
-  document.getElementById('stPct').innerHTML=Math.round(done/45*100)+'<small>%</small>';
-  document.getElementById('pbar').style.width=(done/45*100)+'%';
-  const ph=PHASE_OF(state.sessionDay);
-  document.getElementById('stPhase').textContent=PHASE_NAME[ph][0];
-  document.getElementById('stPhaseD').textContent=PHASE_NAME[ph][1];
+  const done = Object.values(state.days).filter(Boolean).length;
+  $('stDone').innerHTML = done+'<small>/45</small>';
+  $('stPct').innerHTML = Math.round(done/45*100)+'<small>%</small>';
+  $('pbar').style.width = (done/45*100)+'%';
+  const ph = PHASE_OF(state.sessionDay);
+  $('stPhase').textContent = PHASE_NAME[ph][0];
+  $('stPhaseD').textContent = PHASE_NAME[ph][1];
+  const st = streaks();
+  $('stStreak').innerHTML = st.cur + (st.cur >= 3 ? ' 🔥' : '');
+  $('stStreakL').textContent = st.best > st.cur ? `day streak · best ${st.best}` : 'day streak';
+  $('stMin').innerHTML = practiceMin()+'<small>min</small>';
+  const pb = exhaleBest();
+  $('stEx').innerHTML = pb.best ? esc(pb.best)+'<small>s</small>' : '–';
+  document.querySelectorAll('.phase').forEach(p => p.classList.toggle('cur', +p.dataset.ph === ph));
 }
+function renderToggles(){
+  const s = state.settings;
+  const items = [['sound','Sound cues'],['voice','Spoken cues'],['autoNext','Auto-next step'],['wake','Keep screen on']];
+  $('toggles').innerHTML = items.map(([k, l]) => `<button class="tg${s[k]?' on':''}" data-tg="${k}" aria-pressed="${!!s[k]}">${l}</button>`).join('');
+}
+
+function focusHTML(mode){
+  const d = state.sessionDay, ph = PHASE_OF(d), today = ymd();
+  let h = `<div class="focus"><span class="tag" style="background:var(--p${ph})">${PHASE_NAME[ph][0]}</span>${esc(PHASE_FOCUS[ph])}`;
+  const m = missionFor(d);
+  if(m && mode !== 'rest') h += `<div class="mission"><b>Real-life mission:</b> ${esc(m)}</div>`;
+  const doneToday = Object.entries(state.dates).find(([k, v]) => v === today && state.days[k]);
+  const st = streaks();
+  if(doneToday && Object.values(state.days).filter(Boolean).length < 45)
+    h += `<div class="banner">✓ Day ${esc(doneToday[0])} is already done today. Your voice adapts during rest — another session today is optional.</div>`;
+  else if(st.last && dayDiff(st.last, today) >= 3)
+    h += `<div class="banner">Welcome back — ${dayDiff(st.last, today)} days off. No guilt: pick up at Day ${d}. Consider a lighter session first.</div>`;
+  const recent = Object.entries(state.checkins).filter(([k]) => dayDiff(k, today) < 7).map(([, v]) => v);
+  if(recent.filter(v => v === 'rest').length >= 3)
+    h += `<div class="banner warn">Your voice has felt sore or hoarse on ${recent.filter(v => v === 'rest').length} of the last 7 days. Rest fully for a couple of days, and if hoarseness lasts over 2 weeks, see an ENT or speech-language pathologist.</div>`;
+  return h + `</div>`;
+}
+
+function timerHTML(st){
+  const active = T && T.stepId === st.id;
+  if(!active){
+    const done = !!state.session[st.id];
+    return `<div class="tm-idle"><button class="tm-start" data-act="start" data-id="${st.id}"><span class="pl">▶</span>${done?'Redo':'Start'} ${fmt(st.total)}</button>
+      <div class="segs">${st.segs.map(g => `<span class="seg">${esc(g.n)} · ${fmt(g.s)}</span>`).join('')}</div></div>`;
+  }
+  const g = curSeg(), realSegs = T.segs.filter(x => !x.lead), realIdx = T.segs.slice(0, T.idx+1).filter(x => !x.lead).length;
+  return `<div class="tm-live${T.running?'':' paused'}${g.lead?' lead':''}" id="tmLive">
+    <div class="tm-row">
+      <div class="ring"><svg viewBox="0 0 86 86"><circle class="bg" cx="43" cy="43" r="37" fill="none" stroke-width="6"/><circle class="fg" id="tmRing" cx="43" cy="43" r="37" fill="none" stroke-width="6" stroke-linecap="round" stroke-dasharray="232.5" stroke-dashoffset="0"/></svg><div class="clock" id="tmClock">${fmt(segLeft())}</div></div>
+      <div class="tm-info">
+        <div class="tm-count">${g.lead ? 'STARTING IN' : `PART ${realIdx} OF ${realSegs.length}`}${T.running?'':' · PAUSED'}</div>
+        <div class="tm-seg">${esc(g.n)}</div>
+        <div class="tm-tip">${esc(g.tip || '')}</div>
+      </div>
+    </div>
+    ${g.pacer ? `<div class="pacer"><div class="orb" id="tmOrb"></div><div><div class="plab" id="tmPlab">Inhale</div><div class="psub">${g.pacer[0]}s in through the nose · ${g.pacer[1]}s slow out</div></div></div>` : ''}
+    <div class="tm-total"><i id="tmTotal"></i></div>
+    <div class="segs" style="margin-bottom:10px">${T.segs.map((x, i) => x.lead ? '' : `<span class="seg${i===T.idx?' cur':i<T.idx?' past':''}">${esc(x.n)} · ${fmt(x.s)}</span>`).join('')}</div>
+    <div class="tm-ctrl">
+      <button class="primary" data-act="toggle">${T.running?'❚❚ Pause':'▶ Resume'}</button>
+      <button class="ghost" data-act="add">+30s</button>
+      <button class="ghost" data-act="next">${T.idx >= T.segs.length-1 ? 'Finish ✓' : 'Next ›'}</button>
+      <button class="ghost" data-act="stop">Reset</button>
+    </div></div>`;
+}
+function paintTimer(){
+  if(!T) return;
+  const g = curSeg(), left = segLeft(), frac = Math.min(1, Math.max(0, left / g.s));
+  const clock = $('tmClock'); if(clock) clock.textContent = fmt(left);
+  const ring = $('tmRing'); if(ring) ring.style.strokeDashoffset = (232.5 * (1 - frac)).toFixed(1);
+  const tot = $('tmTotal');
+  if(tot){
+    const all = T.segs.filter(x => !x.lead).reduce((a, x) => a + x.s, 0);
+    const past = T.segs.slice(0, T.idx).filter(x => !x.lead).reduce((a, x) => a + x.s, 0) + (g.lead ? 0 : g.s - left);
+    tot.style.width = (Math.min(1, past/all)*100)+'%';
+  }
+  if(g.pacer){
+    const [inn, out] = g.pacer, el = (g.s - left) % (inn + out);
+    const orb = $('tmOrb'), lab = $('tmPlab');
+    let sc, txt;
+    if(el < inn){ sc = .6 + .4*(el/inn); txt = 'Inhale · belly out'; } else { sc = 1 - .4*((el-inn)/out); txt = 'Exhale · slow'; }
+    if(orb) orb.style.transform = `scale(${T.running ? sc.toFixed(3) : .8})`;
+    if(lab && lab.textContent !== txt) lab.textContent = txt;
+  }
+  renderChrome();
+}
+function renderTimer(){
+  if(!T){ renderSession(); return; }
+  const box = $('tm-'+T.stepId);
+  if(!box){ renderSession(); return; }
+  box.innerHTML = timerHTML(plan().find(s => s.id === T.stepId));
+  document.querySelectorAll('.step').forEach(s => s.classList.toggle('active', s.id === 'step-'+T.stepId));
+  paintTimer();
+}
+
 function renderSession(){
-  document.getElementById('sessTitle').textContent='Today · Day '+state.sessionDay+' session';
-  const c=document.getElementById('sessionCard'); c.innerHTML='';
-  STEPS.forEach(st=>{
-    const done=!!state.session[st.id];
-    const el=document.createElement('div');
-    el.className='step'+(done?' done':'');
-    let inner=`<div class="box">${CHK}</div><div>
-      <div class="s-title">${st.t}<span class="t">${st.min}</span></div>
-      <div class="s-desc">${st.d}</div>`;
-    if(st.pencil){
-      inner+=`<div class="pencil"><b>Pencil drill:</b> hold a clean pen/pencil horizontally between your teeth (don't bite hard). Read a paragraph aloud, fighting to stay clear for ~1–2 min. Remove it and read the same lines — they'll feel crisp.
+  const mode = todayMode(), effMode = mode || 'full', steps = plan();
+  const total = steps.reduce((a, s) => a + s.total, 0);
+  $('sessTitle').textContent = (effMode === 'rest' ? 'Recovery · before Day ' : 'Today · Day ') + state.sessionDay + (effMode === 'rest' ? '' : ' session');
+  $('sessNote').textContent = '≈ ' + Math.round(total/60) + ' min · ' + MODES[effMode].label.toLowerCase();
+  const c = $('sessionCard');
+  let h = focusHTML(effMode);
+  if(!mode){
+    h += `<div class="checkin"><div class="q">How does your voice feel today?</div><div class="opts">${Object.entries(MODES).map(([k, m]) =>
+      `<button data-act="mode" data-mode="${k}">${m.label}<small>${m.sub}</small></button>`).join('')}</div></div>`;
+  } else {
+    h += `<div class="mode-line">Today: <b>${MODES[mode].label}</b> · ${MODES[mode].sub} <button class="linkbtn" data-act="mode-change">change</button></div>`;
+  }
+  steps.forEach(st => {
+    const done = !!state.session[st.id];
+    h += `<div class="step${done?' done':''}${T && T.stepId===st.id?' active':''}" id="step-${st.id}">
+      <button class="box" data-act="check" data-id="${st.id}" aria-label="Mark ${esc(st.t)} ${done?'not done':'done'}" aria-pressed="${done}">${CHK}</button>
+      <div class="step-body">
+        <div class="s-title" data-act="check" data-id="${st.id}">${esc(st.t)}<span class="t">${fmt(st.total)}</span></div>
+        <div class="s-desc">${esc(st.d)}</div>`;
+    if(st.hasPencil) h += `<div class="pencil"><b>Pencil drill:</b> hold a clean pen/pencil horizontally between your teeth (don't bite hard). Read a paragraph aloud, fighting to stay clear. Remove it and read the same lines — they'll feel crisp.
         <div class="warnline">Keep your jaw relaxed. Max ~2 min. Stop if your jaw aches.</div></div>`;
-    }
-    inner+=`</div>`;
-    el.innerHTML=inner;
-    el.onclick=()=>{ state.session[st.id]=!state.session[st.id]; save(); renderSession(); };
-    c.appendChild(el);
+    h += `<div class="tm" id="tm-${st.id}">${timerHTML(st)}</div>`;
+    if(st.exhale) h += `<div class="tool" id="exTool">${exhaleHTML()}</div>`;
+    if(st.recorder) h += `<div class="tool" id="recTool">${recToolHTML()}</div>`;
+    h += `</div></div>`;
   });
-  const allDone=STEPS.every(s=>state.session[s.id]);
-  const foot=document.createElement('div');
-  foot.className='session-foot';
-  foot.innerHTML=`<button class="primary" ${allDone?'':'disabled'} id="completeBtn">Complete Day ${state.sessionDay}</button>
-    <button class="ghost" id="clearBtn">Clear</button>
-    <span class="foot-msg">${allDone?'Nice — lock it in.':'Finish all 6 to complete the day.'}</span>`;
-  c.appendChild(foot);
-  document.getElementById('completeBtn').onclick=()=>{ if(!allDone) return; completeDay(); };
-  document.getElementById('clearBtn').onclick=()=>{ state.session={}; save(); renderSession(); };
+  const allDone = steps.every(s => state.session[s.id]);
+  const anyDone = steps.some(s => state.session[s.id]);
+  const finishedAll = Object.values(state.days).filter(Boolean).length >= 45;
+  let btn, msg;
+  if(effMode === 'rest'){
+    btn = `<button class="primary" data-act="log-rest" ${allDone?'':'disabled'}>Log recovery day</button>`;
+    msg = state.rest[ymd()] ? 'Recovery logged — your streak is safe.' : allDone ? 'Gentle work done. Log it to keep your streak.' : 'Recovery days keep your streak but don\'t advance the 45.';
+  } else if(finishedAll){
+    btn = `<button class="primary" disabled>All 45 days done 🎉</button>`; msg = 'Protocol complete. Keep a short daily warm-up to hold the gains.';
+  } else {
+    btn = `<button class="primary" data-act="complete" ${allDone?'':'disabled'}>Complete Day ${state.sessionDay}</button>`;
+    const left = steps.filter(s => !state.session[s.id]).length;
+    msg = allDone ? 'Nice — lock it in.' : `${left} step${left>1?'s':''} to go.`;
+  }
+  const next = steps.find(s => !state.session[s.id]);
+  h += `<div class="session-foot">
+    ${next && !T ? `<button class="primary" data-act="guided">▶ ${anyDone?'Continue':'Start'} guided session</button>` : ''}
+    ${btn}
+    <button class="ghost" data-act="clear">Clear</button>
+    <span class="foot-msg">${msg}</span></div>`;
+  c.innerHTML = h;
+  if(T) paintTimer();
 }
 function completeDay(){
-  state.days[state.sessionDay]=true;
-  state.session={};
-  state.sessionDay=firstIncomplete();
+  if(T) stopT();
+  const d = state.sessionDay;
+  state.days[d] = true; state.dates[d] = ymd();
+  state.session = {};
+  state.sessionDay = firstIncomplete();
+  sessionClipUrl = null;
   save(); renderAll();
+  toast(d === 45 ? 'Day 45 complete. You did the whole protocol. 🎉' : `Day ${d} locked in. See you tomorrow.`);
+  if(d % 7 === 0 && !state.weeks[d/7]) setTimeout(() => toast(`Week ${d/7} done — record your benchmark read below.`), 2600);
 }
 function renderGrid(){
-  const g=document.getElementById('grid'); g.innerHTML='';
-  for(let d=1;d<=45;d++){
-    const ph=PHASE_OF(d), done=!!state.days[d];
-    const el=document.createElement('div');
-    el.className=`cell p${ph}`+(done?' done':'')+(d===state.sessionDay?' today':'');
-    el.innerHTML=`<span class="d">${d}</span><span class="ph">${PHASE_NAME[ph][0].slice(0,4)}</span>`;
-    el.onclick=()=>{ state.days[d]=!state.days[d]; state.sessionDay=firstIncomplete(); save(); renderAll(); };
+  const g = $('grid'); g.innerHTML = '';
+  for(let d=1; d<=45; d++){
+    const ph = PHASE_OF(d), done = !!state.days[d];
+    const el = document.createElement('button');
+    el.className = `cell p${ph}`+(done?' done':'')+(d===state.sessionDay?' today':'');
+    el.title = done && typeof state.dates[d] === 'string' ? `Day ${d} · done ${state.dates[d]}` : `Day ${d}`;
+    el.setAttribute('aria-pressed', done);
+    el.innerHTML = `<span class="d">${d}</span><span class="ph">${PHASE_NAME[ph][0].slice(0,4)}</span>`;
+    el.onclick = () => {
+      state.days[d] = !state.days[d];
+      if(state.days[d]){ if(!state.dates[d]) state.dates[d] = ymd(); } else delete state.dates[d];
+      const prevDay = state.sessionDay;
+      state.sessionDay = firstIncomplete();
+      if(prevDay !== state.sessionDay && T) stopT();
+      save(); renderAll();
+    };
     g.appendChild(el);
   }
 }
 function renderWeeks(){
-  const w=document.getElementById('weeks'); w.innerHTML='';
-  for(let i=1;i<=7;i++){
-    const done=!!state.weeks[i];
-    const el=document.createElement('div');
-    el.className='wk'+(done?' done':'');
-    el.innerHTML=`<div class="wbox">${CHK}</div>Week ${i}`;
-    el.onclick=()=>{ state.weeks[i]=!state.weeks[i]; save(); renderWeeks(); };
+  const w = $('weeks'); w.innerHTML = '';
+  for(let i=1; i<=7; i++){
+    const done = !!state.weeks[i], recHere = REC.rec && REC.target === i;
+    const el = document.createElement('div');
+    el.className = 'wk'+(done?' done':'');
+    el.innerHTML = `<div class="wk-top"><button class="wbox" data-wk="${i}" aria-label="Week ${i} done" aria-pressed="${done}">${CHK}</button><span class="lbl">Week ${i}</span><span class="when">${state.weekDates[i] ? esc(state.weekDates[i]) : (i===currentWeek() ? 'this week' : '')}</span></div>
+      <div class="wk-act">${recHere
+        ? `<button class="danger" data-wkrec="stop">■ Stop</button><span class="foot-msg"><span class="rec-dot"></span><span data-rec-time>0:00</span></span>`
+        : `<button class="ghost" data-wkrec="${i}" ${REC.rec?'disabled':''}>● ${clipUrls[i]?'Re-record':'Record'}</button>${clipUrls[i]?`<button class="ghost" data-wkdel="${i}">Delete</button>`:''}`}</div>
+      ${clipUrls[i] && !recHere ? `<audio controls preload="none" src="${clipUrls[i]}"></audio>` : ''}`;
     w.appendChild(el);
   }
 }
-function renderAll(){ renderStats(); renderSession(); renderGrid(); renderWeeks(); }
+function renderAll(){ renderStats(); renderToggles(); renderSession(); renderGrid(); renderWeeks(); renderChrome(); }
 
-document.getElementById('resetAll').onclick=async()=>{
-  if(!confirm('Reset all 45 days, sessions and weekly logs? This cannot be undone.')) return;
-  state={ days:{}, session:{}, sessionDay:1, weeks:{} };
+let toastT = null;
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2500); }
+
+/* ---------- events ---------- */
+$('sessionCard').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if(!b) return;
+  const id = b.dataset.id;
+  switch(b.dataset.act){
+    case 'check':
+      state.session[id] = !state.session[id];
+      if(T && T.stepId === id) killT();
+      save(); renderSession(); break;
+    case 'start': startStep(id); break;
+    case 'guided': { const n = plan().find(s => !state.session[s.id]); if(n) startStep(n.id, true); break; }
+    case 'toggle': toggleT(); break;
+    case 'add': addTime(30); break;
+    case 'next': nextSeg(); break;
+    case 'stop': stopT(); break;
+    case 'mode': state.checkins[ymd()] = b.dataset.mode; killT(); save(); renderSession(); renderChrome();
+      if(b.dataset.mode === 'rest') toast('Recovery mode: gentle work only. No pushing today.'); break;
+    case 'mode-change': delete state.checkins[ymd()]; killT(); save(); renderSession(); renderChrome(); break;
+    case 'complete': completeDay(); break;
+    case 'log-rest': state.rest[ymd()] = true; state.session = {}; save(); renderAll(); toast('Recovery day logged. Streak kept.'); break;
+    case 'clear': killT(); state.session = {}; save(); renderSession(); renderChrome(); break;
+    case 'exhale': toggleExhale(); break;
+    case 'rec-start': startRec('session'); break;
+    case 'rec-stop': stopRec(); break;
+    case 'rec-bench': if(window._sessionBlob) saveWeekClip(currentWeek(), window._sessionBlob); break;
+  }
+});
+$('toggles').addEventListener('click', e => {
+  const b = e.target.closest('[data-tg]'); if(!b) return;
+  const k = b.dataset.tg; state.settings[k] = !state.settings[k];
+  if(k === 'sound' && state.settings.sound){ unlockAudio(); chime.seg(); }
+  if(k === 'voice' && state.settings.voice) say('Spoken cues on.');
+  if(k === 'wake') wake(state.settings.wake && T && T.running);
+  save(); renderToggles();
+});
+$('weeks').addEventListener('click', async e => {
+  const box = e.target.closest('[data-wk]');
+  if(box){ const i = +box.dataset.wk; state.weeks[i] = !state.weeks[i]; if(state.weeks[i]) state.weekDates[i] = state.weekDates[i] || ymd(); else delete state.weekDates[i]; save(); renderWeeks(); return; }
+  const r = e.target.closest('[data-wkrec]');
+  if(r){ if(r.dataset.wkrec === 'stop') stopRec(); else startRec(+r.dataset.wkrec); return; }
+  const del = e.target.closest('[data-wkdel]');
+  if(del){ const i = +del.dataset.wkdel; if(!confirm(`Delete the Week ${i} recording?`)) return; await clipDel('week-'+i); URL.revokeObjectURL(clipUrls[i]); delete clipUrls[i]; renderWeeks(); }
+});
+document.addEventListener('keydown', e => {
+  if(e.target.closest('input,textarea,button,audio,select,summary') || e.metaKey || e.ctrlKey || e.altKey) return;
+  if(e.code === 'Space' && T){ e.preventDefault(); toggleT(); }
+  else if((e.key === 'n' || e.key === 'N') && T){ nextSeg(); }
+});
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible'){ if(T && T.running){ wake(true); tick(); } }
+  else save();
+});
+window.addEventListener('pagehide', save);
+
+$('resetAll').onclick = async () => {
+  if(!confirm('Reset all 45 days, sessions, stats, weekly logs and recordings? This cannot be undone.')) return;
+  killT();
+  state = freshState();
+  Object.keys(clipUrls).forEach(k => { URL.revokeObjectURL(clipUrls[k]); delete clipUrls[k]; });
+  sessionClipUrl = null; await clipClear();
   await save(); renderAll();
 };
+$('exportBtn').onclick = () => {
+  const blob = new Blob([JSON.stringify(Object.assign({}, state, {timerSnap:null, exportedAt:new Date().toISOString(), app:'voice45'}), null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `voice45-backup-${ymd()}.json`;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  toast('Backup downloaded (recordings stay on this device).');
+};
+$('importBtn').onclick = () => $('importFile').click();
+$('importFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if(!f) return;
+  try{
+    const obj = JSON.parse(await f.text());
+    if(!obj || typeof obj.days !== 'object') throw 0;
+    if(!confirm('Replace your current progress with this backup?')) return;
+    killT(); state = freshState(); mergeState(obj); state.timerSnap = null; state.sessionDay = firstIncomplete();
+    await save(); renderAll(); toast('Backup restored.');
+  }catch(err){ toast('That file isn\'t a valid backup.'); }
+};
 
-(async()=>{ renderWave(); await load(); renderAll(); })();
+(async () => {
+  renderWave();
+  $('passageW').textContent = PASSAGE;
+  await load();
+  // restore a timer that was running when the page closed (as paused)
+  const snap = state.timerSnap;
+  if(snap && snap.day === state.sessionDay && Array.isArray(snap.segs) && snap.segs[snap.idx] && !state.session[snap.stepId] && plan().some(s => s.id === snap.stepId)){
+    T = {stepId:snap.stepId, segs:snap.segs, idx:snap.idx, rem:Math.max(1000, +snap.rem || 0), running:false, lastBeep:null};
+    if(!loop) loop = setInterval(tick, 100);
+  }
+  renderAll();
+  for(let i=1; i<=7; i++){ const b = await clipGet('week-'+i); if(b) clipUrls[i] = URL.createObjectURL(b); }
+  if(Object.keys(clipUrls).length) renderWeeks();
+})();
 </script>
 </body>
 </html>
